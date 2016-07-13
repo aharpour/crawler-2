@@ -7,7 +7,7 @@ public class CrawlCustomData {
     private String restrictToUrl;
     private String pageStorageLocation;
     private PageHitRepository pageHitRepository;
-    private Hasher hasher;
+    private int maxPageCount;
 
     public Pattern getFilter() {
         return filter;
@@ -45,11 +45,11 @@ public class CrawlCustomData {
         return restrictToUrl;
     }
 
-    public Hasher getHasher() {
-        return hasher;
+    public int getMaxPageCount() {
+        return maxPageCount;
     }
 
-    public void setHasher(Hasher hasher) {
-        this.hasher = hasher;
+    public void setMaxPageCount(int maxPageCount) {
+        this.maxPageCount = maxPageCount;
     }
 }

@@ -36,6 +36,9 @@ public class CrawlerApplication implements CommandLineRunner {
                     // application.properties contains settings to be used
                     siteComparator.runComparator();
                     break;
+                default:
+                    System.out.println("Usage: crawl|compare");
+                    return;
             }
         }
     }

@@ -5,25 +5,18 @@ import edu.uci.ics.crawler4j.crawler.CrawlController;
 import edu.uci.ics.crawler4j.fetcher.PageFetcher;
 import edu.uci.ics.crawler4j.robotstxt.RobotstxtConfig;
 import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
-import firstattempt.SingleDepthCrawler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.regex.Pattern;
 
 @Component
 public class CrawlerRunner {
-
+    private static Logger LOG = LoggerFactory.getLogger(CrawlerRunner.class);
 
     public CrawlerRunner() {
-
     }
 
     @Autowired
@@ -32,45 +25,15 @@ public class CrawlerRunner {
     @Autowired
     private PageHitRepository pageHitRepository;
 
-    @Autowired
-    private Hasher hasher;
-
-    private boolean javaDoesnothaveDeleteAllFiles(Path start) {
-        try {
-            Files.walkFileTree(start, new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
-                        throws IOException {
-                    Files.delete(file);
-                    return FileVisitResult.CONTINUE;
-                }
-
-                @Override
-                public FileVisitResult postVisitDirectory(Path dir,
-                                                          IOException exc) throws IOException {
-                    if (exc == null) {
-                        Files.delete(dir);
-                        return FileVisitResult.CONTINUE;
-                    } else {
-                        throw exc;
-                    }
-                }
-
-            });
-            return true;
-        } catch (IOException io) {
-            return false;
-        }
-    }
-
     public void runCrawler() throws Exception {
         // ensure the folder exists
         File resultsFolder = new File(settings.getResultsFolder());
         if (!resultsFolder.exists()) {
-            System.out.println(String.format("no results folder [%s]", resultsFolder));
+            LOG.error(String.format("no results folder [%s]", resultsFolder));
             return;
         }
-        javaDoesnothaveDeleteAllFiles(resultsFolder.toPath());
+//        javaDoesnothaveDeleteAllFiles(resultsFolder.toPath());
+        LOG.error(String.format("ResultsFolder [%s]", resultsFolder.toString()));
         resultsFolder.mkdirs();
 
         CrawlConfig config = new CrawlConfig();
@@ -81,6 +44,8 @@ public class CrawlerRunner {
         config.setCrawlStorageFolder(settings.getStorageFolder());
         config.setProcessBinaryContentInCrawling(true);
         config.setIncludeBinaryContentInCrawling(true);
+        config.setConnectionTimeout(1000*60*4);
+        config.setSocketTimeout(1000 * 1);
 
         /*
          * Instantiate the controller for this crawl.
@@ -95,8 +60,8 @@ public class CrawlerRunner {
 //        customData.setFilter(Pattern.compile(".*(\\.(css|js|gif|jpg|png|mp3|mp3|zip|gz))$"));
         customData.setRestrictToUrl(settings.getSiteBaseUrl());
         customData.setPageStorageLocation(settings.getResultsFolder());
+        customData.setMaxPageCount(settings.getMaxPageCount());
         customData.setPageHitRepository(pageHitRepository);
-        customData.setHasher(hasher);
         controller.setCustomData(customData);
 
 
