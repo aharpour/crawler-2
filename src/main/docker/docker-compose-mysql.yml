@@ -1,0 +1,26 @@
+version: '2'
+
+services:
+  mysql:
+    image: mysql:5.7
+    volumes:
+      - mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "dockerRootPassword"
+      MYSQL_DATABASE: "crawler"
+      MYSQL_USER: "crawlerUsername"
+      MYSQL_PASSWORD: "crawlerPassword"
+    command: ["--max_allowed_packet=512M", "--innodb_log_file_size=200M"]
+    networks:
+      app_network:
+        aliases:
+          - database
+    ports:
+      - "3306:3306"
+    restart: always
+volumes:
+  mysql_data:
+    driver: local
+networks:
+  app_network:
+    driver: bridge

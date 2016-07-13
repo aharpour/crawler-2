@@ -1,0 +1,49 @@
+version: '2'
+
+services:
+  crawler:
+    image: joeblade/crawler:1.0-SNAPSHOT
+    volumes:
+      - crawler_data:/crawler_result
+      - crawler_work:/crawler_work
+    environment:
+      crawler.startPage: "http://sys4.open-web.nl:8880/site/"
+      crawler.siteBaseUrl: "http://sys4.open-web.nl:8880/site/"
+      crawler.comparePath: "http://sys4.open-web.nl:8880/site/"
+      spring.datasource.url: "jdbc:mysql://database/dbName"
+      spring.datasource.username: "username"
+      spring.datasource.password: "userPassword"
+      spring.datasource.driver-class-name: "com.mysql.jdbc.Driver"
+      spring.jpa.hibernate.ddl-auto: "create-drop"
+    command: java -jar app.jar crawl
+    networks:
+      - app_network
+    depends_on:
+      - mysql
+  mysql:
+    image: mysql:5.7
+    volumes:
+      - mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "rootPassword"
+      MYSQL_DATABASE: "dbName"
+      MYSQL_USER: "username"
+      MYSQL_PASSWORD: "userPassword"
+    command: ["--max_allowed_packet=512M", "--innodb_log_file_size=200M"]
+    networks:
+      app_network:
+        aliases:
+          - database
+    ports:
+      - "3306:3306"
+    restart: always
+volumes:
+  mysql_data:
+    driver: local
+  crawler_data:
+    driver: local
+  crawler_work:
+    driver: local
+networks:
+  app_network:
+    driver: bridge
