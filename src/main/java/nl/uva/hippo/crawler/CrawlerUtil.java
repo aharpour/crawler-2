@@ -1,14 +1,14 @@
 package nl.uva.hippo.crawler;
 
-import org.apache.commons.codec.digest.DigestUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.codec.digest.DigestUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CrawlerUtil {
     private static Logger LOG = LoggerFactory.getLogger(CrawlerRunner.class);
@@ -49,9 +49,11 @@ public class CrawlerUtil {
         input = input.replaceAll("src=\'(.*?)\'", "");
         input = input.replaceAll("action=\"(.*?)\"", "");
         input = input.replaceAll("action=\'(.*?)\'", "");
-
+        input = input.replaceAll("id=\"youtube-[^\"]+", "id=\"");
+        input = input.replaceAll("'canonicalURI': '(.*?)',", "");
+        input = input.replaceAll("\r", "");
+        input = input.replaceAll("\n\n", "\n");
         //<script type="application/ld+json">
-
         return input;
     }
 

@@ -1,16 +1,17 @@
 package nl.uva.hippo.crawler;
 
-import edu.uci.ics.crawler4j.crawler.CrawlConfig;
-import edu.uci.ics.crawler4j.crawler.CrawlController;
-import edu.uci.ics.crawler4j.fetcher.PageFetcher;
-import edu.uci.ics.crawler4j.robotstxt.RobotstxtConfig;
-import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
+import java.io.File;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
+import edu.uci.ics.crawler4j.crawler.CrawlConfig;
+import edu.uci.ics.crawler4j.crawler.CrawlController;
+import edu.uci.ics.crawler4j.fetcher.PageFetcher;
+import edu.uci.ics.crawler4j.robotstxt.RobotstxtConfig;
+import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
 
 @Component
 public class CrawlerRunner {
@@ -45,7 +46,7 @@ public class CrawlerRunner {
         config.setProcessBinaryContentInCrawling(true);
         config.setIncludeBinaryContentInCrawling(true);
         config.setConnectionTimeout(1000*60*4);
-        config.setSocketTimeout(1000 * 1);
+        config.setSocketTimeout(1000 * 5);
 
         /*
          * Instantiate the controller for this crawl.
