@@ -68,8 +68,8 @@ public class SiteComparator {
                     diffFile.getParentFile().mkdirs();
                     diffFile.createNewFile();
 
-                    LOG.error(String.format("diff %s %s > %s", crawlFile.getAbsolutePath(), compareFile.getAbsolutePath(), diffFile.getAbsolutePath()));
-                    ProcessBuilder builder = new ProcessBuilder("diff", crawlFile.getAbsolutePath(), compareFile.getAbsolutePath());
+                    LOG.error(String.format("diff -bBw %s %s > %s", crawlFile.getAbsolutePath(), compareFile.getAbsolutePath(), diffFile.getAbsolutePath()));
+                    ProcessBuilder builder = new ProcessBuilder("diff", "-bBw", crawlFile.getAbsolutePath(), compareFile.getAbsolutePath());
                     builder.redirectOutput(diffFile);
                     p = builder.start();
                     p.waitFor();

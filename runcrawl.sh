@@ -7,8 +7,8 @@ rm -r $CRAWL_OUTPUT/*;
 
 java -jar   -Dcrawler.storageFolder=$CRAWL_FOLDER \
             -Dcrawler.resultsFolder=$CRAWL_OUTPUT \
-            -Dcrawler.startPage=http://sys4.open-web.nl:8880/site/ \
-            -Dcrawler.siteBaseUrl=http://sys4.open-web.nl:8880/site/ \
+            -Dcrawler.startPage=http://sys3.open-web.nl:9080/site/hippo/ \
+            -Dcrawler.siteBaseUrl=http://sys3.open-web.nl:9080/site/hippo/ \
             -Dspring.datasource.url=jdbc:mysql://127.0.0.1/crawler \
             -Dspring.datasource.username=crawlerUsername \
             -Dspring.datasource.password=crawlerPassword \

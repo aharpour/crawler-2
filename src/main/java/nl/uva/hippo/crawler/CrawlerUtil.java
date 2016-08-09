@@ -51,11 +51,14 @@ public class CrawlerUtil {
         input = input.replaceAll("action=\'(.*?)\'", "");
         input = input.replaceAll("id=\"youtube-[^\"]+", "id=\"");
         input = input.replaceAll("'canonicalURI': '(.*?)',", "");
-        input = input.replaceAll("\r", "");
-        input = input.replaceAll("\n\n", "\n");
+        input = input.replaceAll("data-main=\"(.*?)\"", "");
+        input = input.replaceAll("'canonicalHostName': '(.*?)'", "");
+        input = input.replaceAll("options.enableSearchboxOnly\\(\"(.*)?\"\\);", "");
+
         //<script type="application/ld+json">
         return input;
     }
+
 
     public static String hashBytes(byte[] bytes) {
         return DigestUtils.sha1Hex(bytes);
