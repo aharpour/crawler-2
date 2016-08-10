@@ -28,3 +28,11 @@ The page is stored and a database table is filled with the page url + hash of th
 usage: runcrawl.sh  , runcompare.sh
 
 crawl should be done before compare. both crawl and compare can be rerun multiple times.
+
+
+
+## Tips and Tricks
+During analysis it might be useful to remove some common and expected deviations. To delete all Diffs containing JasperExceptions if the source had it, and the change fixed it for example:
+```BASH
+find crawler_diff -type f -print0 | xargs -0 grep -l "JasperException"| xargs rm
+```
