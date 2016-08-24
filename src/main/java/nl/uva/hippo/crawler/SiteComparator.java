@@ -1,7 +1,14 @@
 package nl.uva.hippo.crawler;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+
 import com.google.common.collect.Lists;
-import nl.uva.hippo.crawler.entity.PageHit;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -12,14 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
+import nl.uva.hippo.crawler.entity.PageHit;
 
 /**
  * Created by jorishilhorst on 24/06/16.
@@ -36,11 +36,11 @@ public class SiteComparator {
     PageHitRepository pageHitRepository;
 
     public boolean runComparator() {
-        LOG.error("Starting comparator");
-        LOG.error(String.format("ComparePath: %s", settings.getComparePath()));
+        LOG.info("Starting comparator");
+        LOG.info(String.format("ComparePath: %s", settings.getComparePath()));
 
         List<PageHit> hits = Lists.newArrayList(pageHitRepository.findAll());
-        LOG.error(String.format("Verifying %d hits", hits.size()));
+        LOG.info(String.format("Verifying %d hits", hits.size()));
         return verifyIdentical(hits, settings.getComparePath());
     }
 
@@ -49,17 +49,17 @@ public class SiteComparator {
         // paste path to basePath
         // verify that (following redirects) there is a page
         // verify that the hash of the found page is equal to hit.hash
-        int errorCount = 0;
+        int diffCount = 0;
         boolean result = true;
         for (PageHit hit : hits) {
             boolean same = verifyPageHit(hit, basePath);
 
             if (!same) {
-                errorCount++;
+                diffCount++;
 
                 File compareFile = CrawlerUtil.createFileFromPath(Paths.get(hit.getUrl()), null, settings.getCompareResultsFolder());
                 File crawlFile = CrawlerUtil.createFileFromPath(Paths.get(hit.getUrl()), null, settings.getResultsFolder());
-                LOG.error(String.format("difference found between [%s] and [%s]", crawlFile, compareFile));
+                LOG.warn(String.format("difference found between [%s] and [%s]", crawlFile, compareFile));
 
                 File diffFile = CrawlerUtil.createFileFromPath(Paths.get(hit.getUrl()), null, settings.getCompareDiffFolder());
 
@@ -68,7 +68,7 @@ public class SiteComparator {
                     diffFile.getParentFile().mkdirs();
                     diffFile.createNewFile();
 
-                    LOG.error(String.format("diff -bBw %s %s > %s", crawlFile.getAbsolutePath(), compareFile.getAbsolutePath(), diffFile.getAbsolutePath()));
+                    LOG.info(String.format("diff -bBw %s %s > %s", crawlFile.getAbsolutePath(), compareFile.getAbsolutePath(), diffFile.getAbsolutePath()));
                     ProcessBuilder builder = new ProcessBuilder("diff", "-bBw", crawlFile.getAbsolutePath(), compareFile.getAbsolutePath());
                     builder.redirectOutput(diffFile);
                     p = builder.start();
@@ -81,7 +81,7 @@ public class SiteComparator {
             result &= same;
         }
 
-        LOG.error(String.format("Finished verification. result: [%s] total errors: [%d]", result, errorCount));
+        LOG.info(String.format("Finished verification. result: [%s] total differences: [%d]", result, diffCount));
         return result;
     }
 

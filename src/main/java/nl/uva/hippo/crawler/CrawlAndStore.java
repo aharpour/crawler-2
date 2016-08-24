@@ -1,12 +1,5 @@
 package nl.uva.hippo.crawler;
 
-import edu.uci.ics.crawler4j.crawler.Page;
-import edu.uci.ics.crawler4j.crawler.WebCrawler;
-import edu.uci.ics.crawler4j.url.WebURL;
-import nl.uva.hippo.crawler.entity.PageHit;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -14,6 +7,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import edu.uci.ics.crawler4j.crawler.Page;
+import edu.uci.ics.crawler4j.crawler.WebCrawler;
+import edu.uci.ics.crawler4j.url.WebURL;
+import nl.uva.hippo.crawler.entity.PageHit;
 
 public class CrawlAndStore extends WebCrawler {
     private static Logger LOG = LoggerFactory.getLogger(CrawlerRunner.class);
@@ -23,7 +24,7 @@ public class CrawlAndStore extends WebCrawler {
     public void visit(Page page) {
         int count = pageCount.incrementAndGet();
         Path current = Paths.get(page.getWebURL().getURL());
-        LOG.error(String.format("Processing page [%s] [%d]", current, count));
+        LOG.info(String.format("Processing page [%s] [%d]", current, count));
 
         CrawlCustomData customData = (CrawlCustomData) getMyController().getCustomData();
         Path root = Paths.get(customData.getSiteBaseUrl());
@@ -38,7 +39,7 @@ public class CrawlAndStore extends WebCrawler {
 
         try {
             Files.write(newFile.toPath(), contentData.getBytes());
-            LOG.error(String.format("writing file [%s]", newFile.getAbsolutePath()));
+            LOG.info(String.format("writing file [%s]", newFile.getAbsolutePath()));
             PageHitRepository repo = customData.getPageHitRepository();
             PageHit hit = new PageHit(relative.toString(), CrawlerUtil.hashBytes(contentData.getBytes()));
             repo.save(hit);
@@ -51,9 +52,6 @@ public class CrawlAndStore extends WebCrawler {
     @Override
     public boolean shouldVisit(Page referringPage, WebURL url) {
         CrawlCustomData customData = (CrawlCustomData) getMyController().getCustomData();
-        if (pageCount.get() >= customData.getMaxPageCount()) {
-            return false;
-        }
 
         String href = url.getURL().toLowerCase();
         if (customData.getFilter() != null && customData.getFilter().matcher(href).matches()) {
@@ -67,7 +65,7 @@ public class CrawlAndStore extends WebCrawler {
             return false;
         }
 
-        LOG.error(String.format("OK to visit page [%s]", url));
+        LOG.info(String.format("OK to visit page [%s]", url));
         return true;
     }
 

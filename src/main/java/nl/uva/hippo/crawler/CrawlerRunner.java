@@ -41,6 +41,9 @@ public class CrawlerRunner {
         if (settings.getMaxDepth() > 0) {
             config.setMaxDepthOfCrawling(settings.getMaxDepth());
         }
+        if(settings.getMaxPageCount() > 0){
+            config.setMaxPagesToFetch(settings.getMaxPageCount());
+        }
         config.setFollowRedirects(settings.isFollowRedirects());
         config.setCrawlStorageFolder(settings.getStorageFolder());
         config.setProcessBinaryContentInCrawling(true);

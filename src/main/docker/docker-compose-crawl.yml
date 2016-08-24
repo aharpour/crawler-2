@@ -6,15 +6,18 @@ services:
     volumes:
       - crawler_data:/crawler_result
       - crawler_work:/crawler_work
+      - crawler_compare_result:/crawler_compare_result
+      - crawler_diff:/crawler_diff
     environment:
-      crawler.startPage: "http://sys4.open-web.nl:8880/site/"
-      crawler.siteBaseUrl: "http://sys4.open-web.nl:8880/site/"
-      crawler.comparePath: "http://sys4.open-web.nl:8880/site/"
-      spring.datasource.url: "jdbc:mysql://database/dbName"
+      crawler.startPage: "http://localhost:8080/site/"
+      crawler.siteBaseUrl: "http://localhost:8080/site/"
+      crawler.comparePath: "http://localhost:8080/site/"
+      spring.datasource.url: "jdbc:mysql://database/crawl"
+      crawler.concurrentThreads: 5
       spring.datasource.username: "username"
       spring.datasource.password: "userPassword"
       spring.datasource.driver-class-name: "com.mysql.jdbc.Driver"
-      spring.jpa.hibernate.ddl-auto: "create-drop"
+      spring.jpa.hibernate.ddl-auto: "create"
     command: java -jar app.jar crawl
     networks:
       - app_network
@@ -26,7 +29,7 @@ services:
       - mysql_data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: "rootPassword"
-      MYSQL_DATABASE: "dbName"
+      MYSQL_DATABASE: "crawl"
       MYSQL_USER: "username"
       MYSQL_PASSWORD: "userPassword"
     command: ["--max_allowed_packet=512M", "--innodb_log_file_size=200M"]
@@ -43,6 +46,10 @@ volumes:
   crawler_data:
     driver: local
   crawler_work:
+    driver: local
+  crawler_compare_result:
+    driver: local
+  crawler_diff:
     driver: local
 networks:
   app_network:
