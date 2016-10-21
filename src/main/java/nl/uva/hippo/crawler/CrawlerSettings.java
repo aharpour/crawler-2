@@ -3,8 +3,6 @@ package nl.uva.hippo.crawler;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Component
 @ConfigurationProperties(prefix="crawler")
 public class CrawlerSettings {
@@ -77,7 +75,7 @@ public class CrawlerSettings {
     }
 
     public String getComparePath() {
-        return comparePath;
+        return comparePath + (!comparePath.endsWith("/") ? "/" : "");
     }
 
     public void setComparePath(String comparePath) {

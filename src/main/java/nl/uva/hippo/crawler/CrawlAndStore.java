@@ -2,6 +2,8 @@ package nl.uva.hippo.crawler;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,29 +24,33 @@ public class CrawlAndStore extends WebCrawler {
 
     @Override
     public void visit(Page page) {
-        int count = pageCount.incrementAndGet();
-        Path current = Paths.get(page.getWebURL().getURL());
-        LOG.info(String.format("Processing page [%s] [%d]", current, count));
-
-        CrawlCustomData customData = (CrawlCustomData) getMyController().getCustomData();
-        Path root = Paths.get(customData.getSiteBaseUrl());
-        Path relative = root.relativize(current);
-        File newFile = CrawlerUtil.createFileFromPath(current, root, customData.getPageStorageLocation());
-
-        newFile.getParentFile().mkdirs();
-
-        String contentData = new String(page.getContentData(), StandardCharsets.UTF_8);
-
-        contentData = CrawlerUtil.stripChangeableContent(contentData);
-
+        File newFile = null;
         try {
+            int count = pageCount.incrementAndGet();
+            Path current = Paths.get(new URI(page.getWebURL().getURL()).getPath());
+
+            LOG.info(String.format("Processing page [%s] [%d]", current, count));
+
+            CrawlCustomData customData = (CrawlCustomData) getMyController().getCustomData();
+            Path root = Paths.get(new URI(customData.getSiteBaseUrl()).getPath());
+            Path relative = root.relativize(current);
+            newFile = CrawlerUtil.createFileFromPath(current, root, customData.getPageStorageLocation());
+
+            newFile.getParentFile().mkdirs();
+
+            String contentData = new String(page.getContentData(), StandardCharsets.UTF_8);
+
+            contentData = CrawlerUtil.stripChangeableContent(contentData);
+
             Files.write(newFile.toPath(), contentData.getBytes());
             LOG.info(String.format("writing file [%s]", newFile.getAbsolutePath()));
             PageHitRepository repo = customData.getPageHitRepository();
             PageHit hit = new PageHit(relative.toString(), CrawlerUtil.hashBytes(contentData.getBytes()));
             repo.save(hit);
         } catch (IOException io) {
-            LOG.error(String.format("failed to write file to disk: %s", newFile.toString()), io);
+            LOG.error(String.format("failed to write file to disk: %s", newFile != null ? newFile.toString() : "null"), io);
+        } catch (URISyntaxException e) {
+            LOG.error(e.getMessage(), e);
         }
     }
 
@@ -60,7 +66,7 @@ public class CrawlAndStore extends WebCrawler {
             return false;
         }
 
-        if (!href.startsWith(customData.getSiteBaseUrl())) {
+        if (!href.startsWith(customData.getSiteBaseUrl().toLowerCase())) {
             LOG.debug(String.format("NOK to visit page [%s]", url));
             return false;
         }
