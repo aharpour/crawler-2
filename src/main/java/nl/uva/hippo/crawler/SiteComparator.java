@@ -1,17 +1,11 @@
 package nl.uva.hippo.crawler;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
-
 import com.google.common.collect.Lists;
-
+import nl.uva.hippo.crawler.entity.PageHit;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
@@ -19,7 +13,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import nl.uva.hippo.crawler.entity.PageHit;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 
 /**
  * Created by jorishilhorst on 24/06/16.
@@ -87,12 +86,13 @@ public class SiteComparator {
 
     public boolean verifyPageHit(PageHit hit, String basePath) {
         String fullUrl = basePath + hit.getUrl();
+        URIBuilder builder = new URIBuilder().setPath(fullUrl);
 
         byte[] responseBody;
         String contentData = "";
         try {
             HttpClient client = HttpClientBuilder.create().build();
-            HttpGet get = new HttpGet(fullUrl);
+            HttpGet get = new HttpGet(builder.toString());
 
             HttpResponse response = client.execute(get);
             responseBody = EntityUtils.toByteArray(response.getEntity());

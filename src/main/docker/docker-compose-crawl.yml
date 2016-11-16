@@ -2,7 +2,7 @@ version: '2'
 
 services:
   crawler:
-    image: joeblade/crawler:1.0-SNAPSHOT
+    image: aharpour/crawler-2:1.0-SNAPSHOT
     volumes:
       - crawler_data:/crawler_result
       - crawler_work:/crawler_work

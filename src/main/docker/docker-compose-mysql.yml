@@ -7,16 +7,14 @@ services:
       - mysql_data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: "dockerRootPassword"
-      MYSQL_DATABASE: "crawler"
-      MYSQL_USER: "crawlerUsername"
-      MYSQL_PASSWORD: "crawlerPassword"
+      MYSQL_DATABASE: "crawl"
+      MYSQL_USER: "username"
+      MYSQL_PASSWORD: "userPassword"
     command: ["--max_allowed_packet=512M", "--innodb_log_file_size=200M"]
     networks:
       app_network:
         aliases:
           - database
-    ports:
-      - "3306:3306"
     restart: always
 volumes:
   mysql_data:
